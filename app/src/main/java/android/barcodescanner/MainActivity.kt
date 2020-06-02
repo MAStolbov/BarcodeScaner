@@ -15,12 +15,14 @@ import com.google.zxing.integration.android.IntentIntegrator
 class MainActivity : AppCompatActivity() {
 
     private val dataStorage = DataStorage.instance
+    private val scanIntegrator = IntentIntegrator(this)
     lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         scanButtonClickListener(binding)
+        scanIntegrator.setBeepEnabled(false)
 
         Util.endLoading.observe(this, Observer {
             binding.resultText.text = dataStorage.dataFromBase
@@ -29,8 +31,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun scanButtonClickListener(binding: ActivityMainBinding) {
         binding.scaneButton.setOnClickListener {
-            val scanner = IntentIntegrator(this)
-            scanner.initiateScan()
+            scanIntegrator.initiateScan()
         }
     }
 
