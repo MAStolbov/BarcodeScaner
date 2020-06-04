@@ -3,30 +3,46 @@ package android.barcodescanner
 import android.app.Activity
 import android.barcodescanner.databinding.ActivityMainBinding
 import android.content.Intent
-import android.dataStorage.DataStorage
+import android.dataStorage.DataFromBase
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
+import android.repository.Repository
 import android.util.Util
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.google.zxing.integration.android.IntentIntegrator
 
+const val KEY_DATA_FROM_BASE = "data_from_base_key"
+
 class MainActivity : AppCompatActivity() {
 
-    private val dataStorage = DataStorage.instance
+    private var dataFromBase = DataFromBase("")
     private val scanIntegrator = IntentIntegrator(this)
+    private val repository = Repository()
     lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        if (savedInstanceState != null) {
+            dataFromBase.resultData = savedInstanceState.getString(KEY_DATA_FROM_BASE, "")
+            binding.resultText.text = dataFromBase.resultData
+        }
         scanButtonClickListener(binding)
         scanIntegrator.setBeepEnabled(false)
+        scanIntegrator.setOrientationLocked(false)
 
         Util.endLoading.observe(this, Observer {
-            binding.resultText.text = dataStorage.dataFromBase
+            binding.resultText.text = dataFromBase.resultData
         })
+    }
+
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(KEY_DATA_FROM_BASE, dataFromBase.resultData)
     }
 
     private fun scanButtonClickListener(binding: ActivityMainBinding) {
@@ -50,7 +66,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun starDataLoading(barcode:String){
-        dataStorage.loadData(barcode)
+    private fun starDataLoading(barcode: String) {
+        dataFromBase = repository.getDataFromBase(barcode)
+        Util.endLoading.value = true
     }
 }
