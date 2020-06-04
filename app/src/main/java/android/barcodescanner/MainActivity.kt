@@ -6,18 +6,22 @@ import android.content.Intent
 import android.dataStorage.DataFromBase
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.repository.Repository
 import android.util.Util
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import com.google.zxing.integration.android.IntentIntegrator
+import kotlinx.coroutines.*
 
 const val KEY_DATA_FROM_BASE = "data_from_base_key"
 
 class MainActivity : AppCompatActivity() {
 
+    private val ioScope = CoroutineScope(Dispatchers.IO)
     private var dataFromBase = DataFromBase("")
     private val scanIntegrator = IntentIntegrator(this)
     private val repository = Repository()
@@ -30,11 +34,18 @@ class MainActivity : AppCompatActivity() {
             dataFromBase.resultData = savedInstanceState.getString(KEY_DATA_FROM_BASE, "")
             binding.resultText.text = dataFromBase.resultData
         }
+        scanIntegrator.setDesiredBarcodeFormats(
+            IntentIntegrator.CODE_128,
+            IntentIntegrator.EAN_13
+        )
         scanButtonClickListener(binding)
+        viewsForScanVisibility(VISIBLE)
         scanIntegrator.setBeepEnabled(false)
         scanIntegrator.setOrientationLocked(false)
 
         Util.endLoading.observe(this, Observer {
+            loadingViewsVisibility(GONE)
+            viewsForScanVisibility(VISIBLE)
             binding.resultText.text = dataFromBase.resultData
         })
     }
@@ -49,6 +60,16 @@ class MainActivity : AppCompatActivity() {
         binding.scaneButton.setOnClickListener {
             scanIntegrator.initiateScan()
         }
+    }
+
+    private fun viewsForScanVisibility(viewVisibility:Int){
+        binding.scaneButton.visibility = viewVisibility
+        binding.resultText.visibility = viewVisibility
+    }
+
+    private fun loadingViewsVisibility(viewVisibility:Int){
+        binding.loadingBar.visibility = viewVisibility
+        binding.loadingText.visibility = viewVisibility
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -67,7 +88,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun starDataLoading(barcode: String) {
-        dataFromBase = repository.getDataFromBase(barcode)
-        Util.endLoading.value = true
+        viewsForScanVisibility(GONE)
+        loadingViewsVisibility(VISIBLE)
+        ioScope.launch {
+            //имитация скачивания данных из внешнего источника
+            delay(1000)
+            dataFromBase = repository.getDataFromBase(barcode)
+            withContext(Dispatchers.Main){Util.endLoading.value = true}
+        }
     }
 }
