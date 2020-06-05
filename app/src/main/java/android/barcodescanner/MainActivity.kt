@@ -14,7 +14,12 @@ import android.view.View.VISIBLE
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import com.google.zxing.BarcodeFormat
 import com.google.zxing.integration.android.IntentIntegrator
+import com.google.zxing.oned.Code128Reader
+import com.journeyapps.barcodescanner.BarcodeResult
+import com.journeyapps.barcodescanner.BarcodeView
+import com.journeyapps.barcodescanner.DecoratedBarcodeView
 import kotlinx.coroutines.*
 
 const val KEY_DATA_FROM_BASE = "data_from_base_key"
@@ -27,6 +32,7 @@ class MainActivity : AppCompatActivity() {
     private val repository = Repository()
     lateinit var binding: ActivityMainBinding
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -34,10 +40,6 @@ class MainActivity : AppCompatActivity() {
             dataFromBase.resultData = savedInstanceState.getString(KEY_DATA_FROM_BASE, "")
             binding.resultText.text = dataFromBase.resultData
         }
-        scanIntegrator.setDesiredBarcodeFormats(
-            IntentIntegrator.CODE_128,
-            IntentIntegrator.EAN_13
-        )
         scanButtonClickListener(binding)
         viewsForScanVisibility(VISIBLE)
         scanIntegrator.setBeepEnabled(false)
@@ -62,12 +64,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun viewsForScanVisibility(viewVisibility:Int){
+    private fun viewsForScanVisibility(viewVisibility: Int) {
         binding.scaneButton.visibility = viewVisibility
         binding.resultText.visibility = viewVisibility
     }
 
-    private fun loadingViewsVisibility(viewVisibility:Int){
+    private fun loadingViewsVisibility(viewVisibility: Int) {
         binding.loadingBar.visibility = viewVisibility
         binding.loadingText.visibility = viewVisibility
     }
@@ -79,7 +81,11 @@ class MainActivity : AppCompatActivity() {
                 if (result.contents == null) {
                     Toast.makeText(this, "Wrong barcode", Toast.LENGTH_LONG).show()
                 } else {
-                    starDataLoading(result.contents)
+                    if (result.formatName == IntentIntegrator.CODE_128) {
+                        starDataLoading(result.contents)
+                    } else {
+                        binding.resultText.text = "Wrong barcode type:${result.formatName}"
+                    }
                 }
             } else {
                 super.onActivityResult(requestCode, resultCode, data)
@@ -92,9 +98,9 @@ class MainActivity : AppCompatActivity() {
         loadingViewsVisibility(VISIBLE)
         ioScope.launch {
             //имитация скачивания данных из внешнего источника
-            delay(1000)
+            delay(2000)
             dataFromBase = repository.getDataFromBase(barcode)
-            withContext(Dispatchers.Main){Util.endLoading.value = true}
+            withContext(Dispatchers.Main) { Util.endLoading.value = true }
         }
     }
 }
