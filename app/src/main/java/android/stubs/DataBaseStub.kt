@@ -6,7 +6,7 @@ object DataBaseStub {
             "Petrov" -> "Petrov"
             "Ivanov" -> "Ivanov"
             "Wikipedia" -> "Wikipedia barcode"
-            "1111" -> "Some Numbers"
+            "48" -> "Some Numbers"
             else -> "Data not found"
         }
     }
