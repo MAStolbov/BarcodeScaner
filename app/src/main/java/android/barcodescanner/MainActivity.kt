@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         Util.endLoading.observe(this, Observer {
             loadingViewsVisibility(GONE)
             viewsForScanVisibility(VISIBLE)
-            binding.resultText.text = mainViewModel.returnResult()
+            setText()
         })
     }
 
@@ -52,12 +52,20 @@ class MainActivity : AppCompatActivity() {
 
     private fun viewsForScanVisibility(viewVisibility: Int) {
         binding.scaneButton.visibility = viewVisibility
-        binding.resultText.visibility = viewVisibility
+        binding.user.visibility = viewVisibility
+        binding.code.visibility = viewVisibility
+        binding.name.visibility = viewVisibility
     }
 
     private fun loadingViewsVisibility(viewVisibility: Int) {
         binding.loadingBar.visibility = viewVisibility
         binding.loadingText.visibility = viewVisibility
+    }
+
+    private fun setText(){
+        binding.user.text = mainViewModel.dataFromBase?.user
+        binding.code.text = mainViewModel.dataFromBase?.code.toString()
+        binding.name.text = mainViewModel.dataFromBase?.name
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -70,7 +78,8 @@ class MainActivity : AppCompatActivity() {
                     if (result.formatName == IntentIntegrator.CODE_128) {
                         starDataLoading(result.contents)
                     } else {
-                        binding.resultText.text = "Wrong barcode type:${result.formatName}"
+                        binding.errors.text = "Wrong barcode type:${result.formatName}"
+                        binding.errors.visibility = VISIBLE
                     }
                 }
             } else {
