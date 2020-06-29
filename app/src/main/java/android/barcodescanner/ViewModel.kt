@@ -1,9 +1,11 @@
 package android.barcodescanner
 
-import android.dataStorage.DataFromBase
-import android.util.Util
+import android.dataStorage.Account
+import android.dataStorage.Service
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 
-class MainViewModel : ViewModel(){
-    var dataFromBase:DataFromBase? = DataFromBase()
+class MainViewModel : ViewModel() {
+    var account: Account? = Account()
+
 }

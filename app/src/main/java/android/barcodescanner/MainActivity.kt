@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.coroutines.*
+import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -22,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private val scanIntegrator = IntentIntegrator(this)
     private val repository = Repository()
-    private lateinit var mainViewModel:MainViewModel
+    private lateinit var mainViewModel: MainViewModel
 
     lateinit var binding: ActivityMainBinding
 
@@ -31,6 +32,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
+        val adapter =  ServicesAdapter()
+        binding.servicesList.adapter = adapter
 
         scanButtonClickListener(binding)
         viewsForScanVisibility(VISIBLE)
@@ -52,9 +56,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun viewsForScanVisibility(viewVisibility: Int) {
         binding.scaneButton.visibility = viewVisibility
-        binding.user.visibility = viewVisibility
-        binding.code.visibility = viewVisibility
+        binding.middlename.visibility = viewVisibility
+        binding.surname.visibility = viewVisibility
         binding.name.visibility = viewVisibility
+        binding.dateOfVisit.visibility = viewVisibility
+        binding.birthdate.visibility = viewVisibility
+        binding.serviceScroll.visibility = viewVisibility
     }
 
     private fun loadingViewsVisibility(viewVisibility: Int) {
@@ -62,10 +69,13 @@ class MainActivity : AppCompatActivity() {
         binding.loadingText.visibility = viewVisibility
     }
 
-    private fun setText(){
-        binding.user.text = mainViewModel.dataFromBase?.user
-        binding.code.text = mainViewModel.dataFromBase?.code.toString()
-        binding.name.text = mainViewModel.dataFromBase?.name
+    private fun setText() {
+        binding.middlename.text = "Отчество:${mainViewModel.account?.middleName}"
+        binding.surname.text = "Фамилия:${mainViewModel.account?.surname}"
+        binding.name.text = "Имя:${mainViewModel.account?.name}"
+        binding.dateOfVisit.text = "Дата посещения:${mainViewModel.account?.dateOfVisit}"
+        binding.birthdate.text = "Дата рождения${mainViewModel.account?.birthday}"
+        binding.servicesSet.text = mainViewModel.account?.services.toString()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -94,8 +104,19 @@ class MainActivity : AppCompatActivity() {
         ioScope.launch {
             //имитация скачивания данных из внешнего источника
             delay(1000)
-            mainViewModel.dataFromBase = repository.getDataFromBase(barcode)
-            withContext(Dispatchers.Main) { Util.endLoading.value = true }
+            try {
+                mainViewModel.account = repository.getDataFromBase(barcode)
+                withContext(Dispatchers.Main) {
+                    Util.endLoading.value = true
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    loadingViewsVisibility(GONE)
+                    binding.errors.text = "Error ${e.message}"
+                    binding.errors.visibility = VISIBLE
+                    binding.scaneButton.visibility = VISIBLE
+                }
+            }
         }
     }
 }
