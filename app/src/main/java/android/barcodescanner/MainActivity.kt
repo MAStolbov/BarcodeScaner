@@ -33,11 +33,12 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        val adapter =  ServicesAdapter()
+        val adapter = ServicesAdapter()
         binding.servicesList.adapter = adapter
 
         scanButtonClickListener(binding)
-        viewsForScanVisibility(VISIBLE)
+        binding.scaneButton.visibility = VISIBLE
+
         scanIntegrator.setBeepEnabled(false)
         scanIntegrator.setOrientationLocked(false)
 
@@ -50,7 +51,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun scanButtonClickListener(binding: ActivityMainBinding) {
         binding.scaneButton.setOnClickListener {
-            scanIntegrator.initiateScan()
+            binding.errors.visibility = GONE
+            if (mainViewModel.verifyAvailableNetwork(this)) {
+                scanIntegrator.initiateScan()
+            }
+            else{
+                binding.errors.text = "Отсутствует подключение к интернету"
+                binding.errors.visibility = VISIBLE
+            }
         }
     }
 
@@ -62,6 +70,7 @@ class MainActivity : AppCompatActivity() {
         binding.dateOfVisit.visibility = viewVisibility
         binding.birthdate.visibility = viewVisibility
         binding.serviceScroll.visibility = viewVisibility
+        binding.servicesText.visibility = viewVisibility
     }
 
     private fun loadingViewsVisibility(viewVisibility: Int) {
@@ -74,7 +83,7 @@ class MainActivity : AppCompatActivity() {
         binding.surname.text = "Фамилия:${mainViewModel.account?.surname}"
         binding.name.text = "Имя:${mainViewModel.account?.name}"
         binding.dateOfVisit.text = "Дата посещения:${mainViewModel.account?.dateOfVisit}"
-        binding.birthdate.text = "Дата рождения${mainViewModel.account?.birthday}"
+        binding.birthdate.text = "Дата рождения:${mainViewModel.account?.birthday}"
         binding.servicesSet.text = mainViewModel.account?.services.toString()
     }
 

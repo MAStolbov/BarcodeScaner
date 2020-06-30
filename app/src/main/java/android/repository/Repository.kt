@@ -12,12 +12,16 @@ class Repository {
 
     fun getDataFromBase(barcode: String): Account? {
         val logPass = Credentials.basic("goblin", "123123")
-        var data: Account?
+        var data: Account? = Account()
         clinicApi.getCustomerInfoAsync(logPass, barcode).apply {
-            data = execute().body()
-            cancel()
-        }
+            if (execute().isSuccessful) {
+                data = execute().body()
+                cancel()
+            }
+            else{
 
+            }
+        }
         return data
     }
 }
