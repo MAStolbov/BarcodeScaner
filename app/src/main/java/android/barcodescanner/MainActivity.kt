@@ -52,6 +52,7 @@ class MainActivity : AppCompatActivity() {
     private fun scanButtonClickListener(binding: ActivityMainBinding) {
         binding.scaneButton.setOnClickListener {
             binding.errors.visibility = GONE
+            viewsForScanVisibility(GONE)
             if (mainViewModel.verifyAvailableNetwork(this)) {
                 scanIntegrator.initiateScan()
             } else {
@@ -62,7 +63,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun viewsForScanVisibility(viewVisibility: Int) {
-        binding.scaneButton.visibility = viewVisibility
         binding.middlename.visibility = viewVisibility
         binding.surname.visibility = viewVisibility
         binding.name.visibility = viewVisibility
