@@ -54,8 +54,7 @@ class MainActivity : AppCompatActivity() {
             binding.errors.visibility = GONE
             if (mainViewModel.verifyAvailableNetwork(this)) {
                 scanIntegrator.initiateScan()
-            }
-            else{
+            } else {
                 binding.errors.text = "Отсутствует подключение к интернету"
                 binding.errors.visibility = VISIBLE
             }
@@ -121,7 +120,7 @@ class MainActivity : AppCompatActivity() {
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     loadingViewsVisibility(GONE)
-                    binding.errors.text = "Error ${e.message}"
+                    binding.errors.text = e.message
                     binding.errors.visibility = VISIBLE
                     binding.scaneButton.visibility = VISIBLE
                 }

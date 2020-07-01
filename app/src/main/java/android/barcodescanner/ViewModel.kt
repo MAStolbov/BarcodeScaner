@@ -4,7 +4,6 @@ import android.content.Context
 import android.dataStorage.Account
 import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {

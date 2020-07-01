@@ -11,13 +11,13 @@ import retrofit2.http.Path
 
 interface ClinicApi {
     @GET("GetCustomerInfo/{barcode}")
-    fun getCustomerInfoAsync(@Header("Authorization") credentials:String, @Path("barcode") barcode:String):Call<Account>
+    fun getCustomerInfoAsync(
+        @Header("Authorization") credentials: String,
+        @Path("barcode") barcode: String
+    ): Call<Account>
 
     companion object Factory {
         fun create(): ClinicApi {
-
-
-
             val retrofit = Retrofit.Builder()
                 .addConverterFactory(TikXmlConverterFactory.create())
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
