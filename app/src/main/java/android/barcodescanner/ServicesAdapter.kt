@@ -1,30 +1,46 @@
 package android.barcodescanner
 
+import android.barcodescanner.databinding.ServicesItemViewBinding
 import android.dataStorage.Service
 import android.view.LayoutInflater
-import android.view.TextureView
-import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 
-class ServicesAdapter : RecyclerView.Adapter<ViewHolder>() {
+class ServicesAdapter : ListAdapter<Service,ServicesAdapter.ServicesViewHolder>(ServicesNightDiffCallback()) {
 
-    var data = listOf<Service>()
-    override fun getItemCount() = data.size
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = data[position]
+    override fun onBindViewHolder(holder: ServicesViewHolder, position: Int) {
+        val item = getItem(position)
+        holder.apply { bind(item) }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layoutInflater = LayoutInflater.from(parent.context)
-        val view = layoutInflater.inflate(R.layout.services_item_view, parent, false) as TextureView
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ServicesViewHolder {
+        return ServicesViewHolder.from(parent)
+    }
 
-        return ViewHolder(view)
+    class ServicesViewHolder private constructor(val binding: ServicesItemViewBinding) : RecyclerView.ViewHolder(binding.root) {
+        fun bind(item:Service){
+            binding.servicePrice.text = "Цена: ${item.price}"
+            binding.serviseName.text = "Услуга: ${item.name}"
+        }
+
+        companion object{
+            fun from(parent:ViewGroup):ServicesViewHolder{
+                val layoutInflater = LayoutInflater.from(parent.context)
+                val binding = ServicesItemViewBinding.inflate(layoutInflater,parent,false)
+                return ServicesViewHolder(binding)
+            }
+        }
     }
 }
 
+class ServicesNightDiffCallback : DiffUtil.ItemCallback<Service>() {
+    override fun areItemsTheSame(oldItem: Service, newItem: Service): Boolean {
+        return oldItem.name == newItem.name
+    }
 
-class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
+    override fun areContentsTheSame(oldItem: Service, newItem: Service): Boolean {
+        return oldItem == newItem
+    }
 }

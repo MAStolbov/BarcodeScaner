@@ -2,12 +2,26 @@ package android.barcodescanner
 
 import android.content.Context
 import android.dataStorage.Account
+import android.dataStorage.Service
 import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
     var account: Account? = Account()
+    var servicesList = MutableLiveData<List<Service>>()
+    var totalPrice = 0
+
+    fun setServicesList(){
+        servicesList.value = account?.services
+    }
+
+    fun getTotalPrice(){
+        account?.services?.forEach {
+            totalPrice += it.price.toInt()
+        }
+    }
 
     fun verifyAvailableNetwork(activity: AppCompatActivity): Boolean {
         val connectivityManager =
