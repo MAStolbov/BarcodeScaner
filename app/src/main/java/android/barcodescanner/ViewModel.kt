@@ -18,6 +18,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun getTotalPrice(){
+        totalPrice = 0
         account?.services?.forEach {
             totalPrice += it.price.toInt()
         }
