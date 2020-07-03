@@ -10,18 +10,18 @@ import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
     var account: Account? = Account()
-    var servicesList = MutableLiveData<List<Service>>()
-    var totalPrice = 0
+    var servicesList = MutableLiveData<List<Service?>>()
 
     fun setServicesList(){
         servicesList.value = account?.services
     }
 
-    fun getTotalPrice(){
-        totalPrice = 0
+    fun getTotalPrice():Int{
+        var totalPrice = 0
         account?.services?.forEach {
             totalPrice += it.price.toInt()
         }
+        return  totalPrice
     }
 
     fun verifyAvailableNetwork(activity: AppCompatActivity): Boolean {

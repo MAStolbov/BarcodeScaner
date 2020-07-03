@@ -46,7 +46,6 @@ class MainActivity : AppCompatActivity() {
             loadingViewsVisibility(GONE)
             viewsForScanVisibility(VISIBLE)
             mainViewModel.setServicesList()
-            mainViewModel.getTotalPrice()
             setText()
         })
 
@@ -78,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         binding.birthdate.visibility = viewVisibility
         binding.servicesText.visibility = viewVisibility
         binding.servicesList.visibility = viewVisibility
-        binding.totalPrice.visibility = viewVisibility
+//        binding.totalPrice.visibility = viewVisibility
     }
 
     private fun loadingViewsVisibility(viewVisibility: Int) {
@@ -92,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         binding.name.text = "Имя:${mainViewModel.account?.name}"
         binding.dateOfVisit.text = "Дата посещения:${mainViewModel.account?.dateOfVisit}"
         binding.birthdate.text = "Дата рождения:${mainViewModel.account?.birthday}"
-        binding.totalPrice.text = "Итог: ${mainViewModel.totalPrice}"
+//        binding.totalPrice.text = "Итог: ${mainViewModel.getTotalPrice()}"
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
