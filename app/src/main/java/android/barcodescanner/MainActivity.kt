@@ -43,8 +43,8 @@ class MainActivity : AppCompatActivity() {
         scanIntegrator.setOrientationLocked(false)
 
         Util.endLoading.observe(this, Observer {
-            loadingViewsVisibility(GONE)
-            viewsForScanVisibility(VISIBLE)
+            setLoadingViewsVisibility(GONE)
+            setViewsForScanVisibility(VISIBLE)
             mainViewModel.setServicesList()
             setText()
         })
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
     private fun scanButtonClickListener(binding: ActivityMainBinding) {
         binding.scaneButton.setOnClickListener {
             binding.errors.visibility = GONE
-            viewsForScanVisibility(GONE)
+            setViewsForScanVisibility(GONE)
             if (mainViewModel.verifyAvailableNetwork(this)) {
                 scanIntegrator.initiateScan()
             } else {
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun viewsForScanVisibility(viewVisibility: Int) {
+    private fun setViewsForScanVisibility(viewVisibility: Int) {
         binding.middlename.visibility = viewVisibility
         binding.surname.visibility = viewVisibility
         binding.name.visibility = viewVisibility
@@ -77,10 +77,10 @@ class MainActivity : AppCompatActivity() {
         binding.birthdate.visibility = viewVisibility
         binding.servicesText.visibility = viewVisibility
         binding.servicesList.visibility = viewVisibility
-//        binding.totalPrice.visibility = viewVisibility
+        binding.totalPrice.visibility = viewVisibility
     }
 
-    private fun loadingViewsVisibility(viewVisibility: Int) {
+    private fun setLoadingViewsVisibility(viewVisibility: Int) {
         binding.loadingBar.visibility = viewVisibility
         binding.loadingText.visibility = viewVisibility
     }
@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
         binding.name.text = "Имя:${mainViewModel.account?.name}"
         binding.dateOfVisit.text = "Дата посещения:${mainViewModel.account?.dateOfVisit}"
         binding.birthdate.text = "Дата рождения:${mainViewModel.account?.birthday}"
-//        binding.totalPrice.text = "Итог: ${mainViewModel.getTotalPrice()}"
+        binding.totalPrice.text = "Итог: ${mainViewModel.getTotalPrice()}"
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -99,12 +99,19 @@ class MainActivity : AppCompatActivity() {
             val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
             if (result != null) {
                 if (result.contents == null) {
-                    Toast.makeText(this, "Wrong barcode", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Неправильный шрих-код", Toast.LENGTH_LONG).show()
                 } else {
                     if (result.formatName == IntentIntegrator.CODE_128) {
-                        starDataLoading(result.contents)
+                        if (Util.checkBarcodeCRC(result.contents)) {
+                            starDataLoading(result.contents)
+                        } else {
+                            binding.errors.text =
+                                "Штрих-код повреждён:${result.contents}"
+                            binding.errors.visibility = VISIBLE
+                        }
                     } else {
-                        binding.errors.text = "Wrong barcode type:${result.formatName}"
+                        binding.errors.text =
+                            "Неправильный тип штрих-кода:${result.formatName} ${result.contents}"
                         binding.errors.visibility = VISIBLE
                     }
                 }
@@ -115,8 +122,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun starDataLoading(barcode: String) {
-        viewsForScanVisibility(GONE)
-        loadingViewsVisibility(VISIBLE)
+        setViewsForScanVisibility(GONE)
+        setLoadingViewsVisibility(VISIBLE)
         ioScope.launch {
             //имитация скачивания данных из внешнего источника
             delay(1000)
@@ -127,7 +134,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    loadingViewsVisibility(GONE)
+                    setLoadingViewsVisibility(GONE)
                     binding.errors.text = e.message
                     binding.errors.visibility = VISIBLE
                     binding.scaneButton.visibility = VISIBLE

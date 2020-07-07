@@ -9,21 +9,21 @@ data class Account(
     @Attribute(name = "AccountDate")
     var dateOfVisit: String? = "",
     @Attribute(name = "Surname")
-    var surname:String ="",
+    var surname: String = "",
     @Attribute(name = "Name")
-    var name:String ="",
+    var name: String = "",
     @Attribute(name = "MiddleName")
-    var middleName:String ="",
+    var middleName: String = "",
     @Attribute(name = "Birthday")
-    var birthday:String ="",
+    var birthday: String = "",
     @Element
-    var services:List<Service> = listOf()
+    var services: List<Service> = listOf()
 )
 
 @Xml(name = "Service")
 data class Service(
     @Attribute(name = "Name")
-    var name:String = "",
+    var name: String = "",
     @Attribute(name = "Price")
-    var price:String =""
+    var price: String = ""
 )

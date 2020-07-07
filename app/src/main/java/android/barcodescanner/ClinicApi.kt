@@ -11,7 +11,7 @@ import retrofit2.http.Path
 
 interface ClinicApi {
     @GET("GetCustomerInfo/{barcode}")
-    fun getCustomerInfoAsync(
+    fun getCustomerInfo(
         @Header("Authorization") credentials: String,
         @Path("barcode") barcode: String
     ): Call<Account>

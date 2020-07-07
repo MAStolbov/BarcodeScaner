@@ -17,11 +17,7 @@ class MainViewModel : ViewModel() {
     }
 
     fun getTotalPrice():Int{
-        var totalPrice = 0
-        account?.services?.forEach {
-            totalPrice += it.price.toInt()
-        }
-        return  totalPrice
+        return account?.services?.map {it.price.toInt()}?.sum() ?: 0
     }
 
     fun verifyAvailableNetwork(activity: AppCompatActivity): Boolean {
