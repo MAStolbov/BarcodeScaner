@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
         scanIntegrator.setBeepEnabled(false)
         scanIntegrator.setOrientationLocked(false)
 
-        Util.endLoading.observe(this, Observer {
+        mainViewModel.endLoading.observe(this, Observer {
             setLoadingViewsVisibility(GONE)
             setViewsForScanVisibility(VISIBLE)
             mainViewModel.setServicesList()
@@ -102,11 +102,11 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this, "Неправильный шрих-код", Toast.LENGTH_LONG).show()
                 } else {
                     if (result.formatName == IntentIntegrator.CODE_128) {
-                        if (Util.checkBarcodeCRC(result.contents)) {
+                        if (mainViewModel.checkBarcodeCRC(result.contents)) {
                             starDataLoading(result.contents)
                         } else {
                             binding.errors.text =
-                                "Штрих-код повреждён:${result.contents}"
+                                "Неправильный тип штрих-кода:${result.contents}"
                             binding.errors.visibility = VISIBLE
                         }
                     } else {
@@ -130,7 +130,7 @@ class MainActivity : AppCompatActivity() {
             try {
                 mainViewModel.account = repository.getDataFromBase(barcode)
                 withContext(Dispatchers.Main) {
-                    Util.endLoading.value = true
+                    mainViewModel.endLoading.value = true
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {

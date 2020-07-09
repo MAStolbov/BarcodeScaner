@@ -7,17 +7,33 @@ import android.net.ConnectivityManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import java.lang.Exception
+import java.util.zip.CRC32
 
 class MainViewModel : ViewModel() {
+    private val barcodeFormat = Regex("""\d+-\d+""")
+
+    val endLoading = MutableLiveData<Boolean>()
     var account: Account? = Account()
     var servicesList = MutableLiveData<List<Service?>>()
 
-    fun setServicesList(){
+    fun checkBarcodeCRC(barcode: String): Boolean {
+        val crc32 = CRC32()
+        return if (barcodeFormat.matches(barcode)) {
+            val (notCrc, crc) = barcode.split('-')
+            crc32.update(notCrc.toByteArray())
+            crc32.value == crc.toLong()
+        } else {
+            false
+        }
+    }
+
+    fun setServicesList() {
         servicesList.value = account?.services
     }
 
-    fun getTotalPrice():Int{
-        return account?.services?.map {it.price.toInt()}?.sum() ?: 0
+    fun getTotalPrice(): Int {
+        return account?.services?.map { it.price.toInt() }?.sum() ?: 0
     }
 
     fun verifyAvailableNetwork(activity: AppCompatActivity): Boolean {
