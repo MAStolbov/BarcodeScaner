@@ -9,15 +9,17 @@ data class Account(
     @Attribute(name = "AccountDate")
     var dateOfVisit: String? = "",
     @Attribute(name = "Surname")
-    var surname: String = "",
+    var surname: String? = "",
     @Attribute(name = "Name")
-    var name: String = "",
+    var name: String? = "",
     @Attribute(name = "MiddleName")
-    var middleName: String = "",
+    var middleName: String? = "",
     @Attribute(name = "Birthday")
-    var birthday: String = "",
+    var birthday: String? = "",
     @Element
-    var services: List<Service> = listOf()
+    var services: List<Service>? = listOf(),
+    @Attribute(name = "Description")
+    var errorFromServer: String? = ""
 )
 
 @Xml(name = "Service")

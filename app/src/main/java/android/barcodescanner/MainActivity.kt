@@ -3,6 +3,7 @@ package android.barcodescanner
 import android.app.Activity
 import android.barcodescanner.databinding.ActivityMainBinding
 import android.content.Intent
+import android.dataStorage.Account
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.repository.Repository
@@ -15,7 +16,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.coroutines.*
-import java.lang.Exception
 
 
 class MainActivity : AppCompatActivity() {
@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun scanButtonClickListener(binding: ActivityMainBinding) {
         binding.scaneButton.setOnClickListener {
+            mainViewModel.account = Account()
             binding.errors.visibility = GONE
             setViewsForScanVisibility(GONE)
             if (mainViewModel.verifyAvailableNetwork(this)) {
@@ -85,6 +86,13 @@ class MainActivity : AppCompatActivity() {
         binding.loadingText.visibility = viewVisibility
     }
 
+    private fun showErrorInfo(errorText: String) {
+        setLoadingViewsVisibility(GONE)
+        binding.errors.text = errorText
+        binding.errors.visibility = VISIBLE
+        binding.scaneButton.visibility = VISIBLE
+    }
+
     private fun setText() {
         binding.middlename.text = "Отчество:${mainViewModel.account?.middleName}"
         binding.surname.text = "Фамилия:${mainViewModel.account?.surname}"
@@ -106,7 +114,7 @@ class MainActivity : AppCompatActivity() {
                             starDataLoading(result.contents)
                         } else {
                             binding.errors.text =
-                                "Неправильный тип штрих-кода:${result.contents}"
+                                "Неправильный вид штрих-кода:${result.contents}"
                             binding.errors.visibility = VISIBLE
                         }
                     } else {
@@ -126,18 +134,13 @@ class MainActivity : AppCompatActivity() {
         setLoadingViewsVisibility(VISIBLE)
         ioScope.launch {
             //имитация скачивания данных из внешнего источника
-            delay(1000)
-            try {
-                mainViewModel.account = repository.getDataFromBase(barcode)
-                withContext(Dispatchers.Main) {
+            delay(500)
+            mainViewModel.account = repository.getDataFromBase(barcode)
+            withContext(Dispatchers.Main) {
+                if (Util.dataReceivedSuccessful) {
                     mainViewModel.endLoading.value = true
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    setLoadingViewsVisibility(GONE)
-                    binding.errors.text = e.message
-                    binding.errors.visibility = VISIBLE
-                    binding.scaneButton.visibility = VISIBLE
+                } else {
+                    showErrorInfo(Util.errorText)
                 }
             }
         }
