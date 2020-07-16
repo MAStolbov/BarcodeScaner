@@ -2,7 +2,9 @@ package android.barcodescanner
 
 import android.app.Activity
 import android.barcodescanner.databinding.ActivityMainBinding
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.dataStorage.Account
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,6 +19,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.coroutines.*
 
+const val SERVER_ADDRESS = "address"
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity() {
     private val scanIntegrator = IntentIntegrator(this)
     private val repository = Repository()
     private lateinit var mainViewModel: MainViewModel
+    private lateinit var serverConnectionPref: SharedPreferences
 
     lateinit var binding: ActivityMainBinding
 
@@ -32,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         mainViewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+        serverConnectionPref = getSharedPreferences("settings", Context.MODE_PRIVATE)
 
         val adapter = ServicesAdapter()
         binding.servicesList.adapter = adapter
@@ -54,6 +59,23 @@ class MainActivity : AppCompatActivity() {
                 adapter.submitList(it)
             }
         })
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        serverConnectionPref.edit().apply {
+            putString(SERVER_ADDRESS,Util.serverAddress)
+            apply()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        if (serverConnectionPref.contains(SERVER_ADDRESS)){
+            Util.serverAddress = serverConnectionPref.getString(SERVER_ADDRESS,"") ?: ""
+        }
     }
 
     private fun scanButtonClickListener(binding: ActivityMainBinding) {
@@ -107,14 +129,14 @@ class MainActivity : AppCompatActivity() {
             val result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
             if (result != null) {
                 if (result.contents == null) {
-                    Toast.makeText(this, "Неправильный шрих-код", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, "Ошибка сканирования", Toast.LENGTH_LONG).show()
                 } else {
                     if (result.formatName == IntentIntegrator.CODE_128) {
                         if (mainViewModel.checkBarcodeCRC(result.contents)) {
                             starDataLoading(result.contents)
                         } else {
                             binding.errors.text =
-                                "Неправильный вид штрих-кода:${result.contents}"
+                                "Штрих-код не подлежит проверке (ошибка контрольной суммы):${result.contents}"
                             binding.errors.visibility = VISIBLE
                         }
                     } else {
@@ -134,7 +156,6 @@ class MainActivity : AppCompatActivity() {
         setLoadingViewsVisibility(VISIBLE)
         ioScope.launch {
             //имитация скачивания данных из внешнего источника
-            delay(500)
             mainViewModel.account = repository.getDataFromBase(barcode)
             withContext(Dispatchers.Main) {
                 if (Util.dataReceivedSuccessful) {

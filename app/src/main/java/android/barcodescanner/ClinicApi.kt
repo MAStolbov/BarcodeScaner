@@ -1,6 +1,7 @@
 package android.barcodescanner
 
 import android.dataStorage.Account
+import android.util.Util
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.tickaroo.tikxml.retrofit.TikXmlConverterFactory
 import retrofit2.Call
@@ -21,7 +22,8 @@ interface ClinicApi {
             val retrofit = Retrofit.Builder()
                 .addConverterFactory(TikXmlConverterFactory.create())
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
-                .baseUrl("http://31.40.62.188:56280/ClinicWork/hs/ClinicRoot/")
+//                .baseUrl("http://31.40.62.188:56280/ClinicWork/hs/ClinicRoot/")
+                .baseUrl(Util.serverAddress)
                 .build()
 
             return retrofit.create(ClinicApi::class.java)

@@ -3,7 +3,12 @@ package android.barcodescanner
 import android.content.Context
 import android.dataStorage.Account
 import android.dataStorage.Service
+import android.graphics.Typeface
 import android.net.ConnectivityManager
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.RelativeSizeSpan
+import android.text.style.StyleSpan
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -11,7 +16,7 @@ import java.lang.Exception
 import java.util.zip.CRC32
 
 class MainViewModel : ViewModel() {
-    private val barcodeFormat = Regex("""\d+-\d+""")
+    private val barcodeFormat = Regex("""\d{1,9}-\d{4,15}""")
 
     val endLoading = MutableLiveData<Boolean>()
     var account: Account? = Account()
