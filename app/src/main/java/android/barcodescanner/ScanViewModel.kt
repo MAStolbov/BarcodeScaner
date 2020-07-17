@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModel
 import java.lang.Exception
 import java.util.zip.CRC32
 
-class MainViewModel : ViewModel() {
+class ScanViewModel : ViewModel() {
     private val barcodeFormat = Regex("""\d{1,9}-\d{4,15}""")
 
     val endLoading = MutableLiveData<Boolean>()
@@ -41,9 +41,9 @@ class MainViewModel : ViewModel() {
         return account?.services?.map { it.price.toInt() }?.sum() ?: 0
     }
 
-    fun verifyAvailableNetwork(activity: AppCompatActivity): Boolean {
+    fun verifyAvailableNetwork(context: Context?): Boolean {
         val connectivityManager =
-            activity.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.isConnected
     }
