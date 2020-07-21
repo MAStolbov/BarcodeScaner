@@ -33,6 +33,10 @@ class ScanViewModel : ViewModel() {
         }
     }
 
+    fun openSettings(barcode:String):Boolean{
+        return barcode == "settings"
+    }
+
     fun setServicesList() {
         servicesList.value = account?.services
     }

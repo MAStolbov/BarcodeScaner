@@ -17,11 +17,14 @@ import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+
+const val SERVER_ADDRESS_KEY = "server address"
 
 class ScanFragment : Fragment() {
 
@@ -29,8 +32,8 @@ class ScanFragment : Fragment() {
     private val repository = Repository()
     private lateinit var scanViewModel: ScanViewModel
     private lateinit var scanIntegrator: IntentIntegrator
-
-    lateinit var binding: FragmentScanBinding
+    private lateinit var connectionPreferences: SharedPreferences
+    private lateinit var binding: FragmentScanBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,6 +66,13 @@ class ScanFragment : Fragment() {
         })
 
         return binding.root
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        connectionPreferences =
+            context.getSharedPreferences("connection settings", Context.MODE_PRIVATE)
+
     }
 
     private fun scanButtonClickListener(binding: FragmentScanBinding) {
@@ -124,6 +134,9 @@ class ScanFragment : Fragment() {
                     Toast.makeText(context, "Ошибка сканирования", Toast.LENGTH_LONG).show()
                 } else {
                     if (result.formatName == IntentIntegrator.CODE_128) {
+                        if (scanViewModel.openSettings(result.contents)) {
+                            findNavController().navigate(R.id.action_scanFragment_to_connectionSettingsFragment)
+                        }
                         if (scanViewModel.checkBarcodeCRC(result.contents)) {
                             starDataLoading(result.contents)
                         } else {
@@ -142,9 +155,9 @@ class ScanFragment : Fragment() {
     private fun starDataLoading(barcode: String) {
         setViewsForScanVisibility(View.GONE)
         setLoadingViewsVisibility(View.VISIBLE)
+        val serverAddress= connectionPreferences.getString(SERVER_ADDRESS_KEY, "") ?: ""
         ioScope.launch {
-            //имитация скачивания данных из внешнего источника
-            scanViewModel.account = repository.getDataFromBase(barcode)
+            scanViewModel.account = repository.getDataFromBase(serverAddress, barcode)
             withContext(Dispatchers.Main) {
                 if (Util.dataReceivedSuccessful) {
                     scanViewModel.endLoading.value = true

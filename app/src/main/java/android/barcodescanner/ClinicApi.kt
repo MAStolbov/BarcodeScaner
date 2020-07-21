@@ -11,19 +11,21 @@ import retrofit2.http.Header
 import retrofit2.http.Path
 
 interface ClinicApi {
+
     @GET("GetCustomerInfo/{barcode}")
     fun getCustomerInfo(
         @Header("Authorization") credentials: String,
         @Path("barcode") barcode: String
     ): Call<Account>
 
+
+
     companion object Factory {
-        fun create(): ClinicApi {
+        fun create(serverAddress:String): ClinicApi {
             val retrofit = Retrofit.Builder()
                 .addConverterFactory(TikXmlConverterFactory.create())
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
-//                .baseUrl("http://31.40.62.188:56280/ClinicWork/hs/ClinicRoot/")
-                .baseUrl(Util.serverAddress)
+                .baseUrl(serverAddress)
                 .build()
 
             return retrofit.create(ClinicApi::class.java)

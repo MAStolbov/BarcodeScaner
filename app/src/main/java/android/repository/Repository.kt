@@ -7,9 +7,9 @@ import okhttp3.Credentials
 import java.lang.Exception
 
 class Repository {
-    private val clinicApi = ClinicApi.create()
 
-    fun getDataFromBase(barcode: String): Account? {
+    fun getDataFromBase(serverAddress:String,barcode: String): Account? {
+        val clinicApi = ClinicApi.create(serverAddress)
         val logPass = Credentials.basic("goblin", "123123")
         var data: Account? = null
         try {

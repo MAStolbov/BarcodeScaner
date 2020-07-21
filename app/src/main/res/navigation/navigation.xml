@@ -13,6 +13,10 @@
         <action
             android:id="@+id/action_connectionSettingsFragment_to_scanFragment"
             app:destination="@id/scanFragment" />
+        <argument
+            android:name="serverAddress"
+            app:argType="string"
+            android:defaultValue='""' />
     </fragment>
     <fragment
         android:id="@+id/scanFragment"
@@ -22,5 +26,9 @@
         <action
             android:id="@+id/action_scanFragment_to_connectionSettingsFragment"
             app:destination="@id/connectionSettingsFragment" />
+        <argument
+            android:name="serverAddress"
+            app:argType="string"
+            android:defaultValue='""' />
     </fragment>
 </navigation>
