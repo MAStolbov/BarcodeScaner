@@ -8,9 +8,9 @@ import java.lang.Exception
 
 class Repository {
 
-    fun getDataFromBase(serverAddress:String,barcode: String): Account? {
+    fun getDataFromBase(serverAddress:String, login:String, password:String, barcode: String): Account? {
         val clinicApi = ClinicApi.create(serverAddress)
-        val logPass = Credentials.basic("goblin", "123123")
+        val logPass = Credentials.basic(login, password)
         var data: Account? = null
         try {
             clinicApi.getCustomerInfo(logPass, barcode).apply {

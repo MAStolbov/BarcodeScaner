@@ -25,6 +25,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 const val SERVER_ADDRESS_KEY = "server address"
+const val LOGIN_KEY = "login"
+const val PASSWORD_KEY = "password"
 
 class ScanFragment : Fragment() {
 
@@ -123,7 +125,7 @@ class ScanFragment : Fragment() {
         binding.name.text = "${scanViewModel.account?.name}"
         binding.dateOfVisit.text = "${scanViewModel.account?.dateOfVisit}"
         binding.birthdate.text = "${scanViewModel.account?.birthday}"
-        binding.totalPrice.text = "Итог: ${scanViewModel.getTotalPrice()}"
+        binding.totalPrice.text = "Итог: ${scanViewModel.getTotalPrice()} руб."
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -155,9 +157,14 @@ class ScanFragment : Fragment() {
     private fun starDataLoading(barcode: String) {
         setViewsForScanVisibility(View.GONE)
         setLoadingViewsVisibility(View.VISIBLE)
-        val serverAddress= connectionPreferences.getString(SERVER_ADDRESS_KEY, "") ?: ""
+        val serverAddress = connectionPreferences.getString(SERVER_ADDRESS_KEY, "") ?: ""
+        val login = connectionPreferences.getString(LOGIN_KEY, "") ?: ""
+        val password = connectionPreferences.getString(PASSWORD_KEY, "") ?: ""
         ioScope.launch {
-            scanViewModel.account = repository.getDataFromBase(serverAddress, barcode)
+            scanViewModel.account =
+                repository.getDataFromBase(serverAddress, login, password, barcode)
+//            scanViewModel.account = Util.setTextAccount()
+//            Util.dataReceivedSuccessful = true
             withContext(Dispatchers.Main) {
                 if (Util.dataReceivedSuccessful) {
                     scanViewModel.endLoading.value = true

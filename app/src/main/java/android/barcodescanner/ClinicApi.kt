@@ -12,7 +12,7 @@ import retrofit2.http.Path
 
 interface ClinicApi {
 
-    @GET("GetCustomerInfo/{barcode}")
+    @GET("{barcode}")
     fun getCustomerInfo(
         @Header("Authorization") credentials: String,
         @Path("barcode") barcode: String

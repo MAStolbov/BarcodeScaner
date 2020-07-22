@@ -21,7 +21,7 @@ class ServicesAdapter : ListAdapter<Service,ServicesAdapter.ServicesViewHolder>(
 
     class ServicesViewHolder private constructor(val binding: ServicesItemViewBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item:Service){
-            binding.servicePrice.text = "Цена: ${item.price}"
+            binding.servicePrice.text = "${item.price} руб."
             binding.serviseName.text = "${item.name}"
         }
 
