@@ -19,11 +19,11 @@ object Util {
             name = "some name"
             middleName = "some middle name"
             birthday = "some birthday"
-//            services = listOf(Service("услуга1","1"),Service("услуга2","2"),Service("услуга3","3"),
-//                Service("услуга4","4"),Service("услуга5","5"),Service("услуга6","6"),Service("услуга7","7"),
-//                Service("услуга8","9"),Service("услуга10","10"),Service("услуга11","11"),Service("услуга12","12"),
-//                Service("услуга12","12"),Service("услуга12","12"),Service("услуга12","12"),Service("услуга12","12"))
-            services = listOf(Service("услуга1","1"))
+            services = listOf(Service("услуга1","1.1"),Service("услуга2","2,2"),Service("услуга3","30 000"),
+                Service("услуга4",""),Service("услуга5","f"),Service("услуга6"," "),Service("услуга7","1f"),
+                Service("услуга8","9"),Service("услуга10","10"),Service("услуга11","11"),Service("услуга12","12"),
+                Service("услуга12","12"),Service("услуга12","12"),Service("услуга12","12"),Service("услуга12","12"))
+//            services = listOf(Service("услуга1","1"))
         }
         return testAccount
     }

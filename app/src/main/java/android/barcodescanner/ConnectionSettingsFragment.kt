@@ -35,15 +35,9 @@ class ConnectionSettingsFragment : Fragment() {
             connectionPreferences.getString(SERVER_ADDRESS_KEY, "")
         )
 
-        binding.loginPlainText.setText(connectionPreferences.getString(LOGIN_KEY,""))
-
-        binding.passwordPlainText.setText(connectionPreferences.getString(PASSWORD_KEY,""))
-
         binding.setAddress.setOnClickListener {
             connectionPreferences.edit().apply {
                 putString(SERVER_ADDRESS_KEY,binding.serverAddressPlainText.text.toString())
-                putString(LOGIN_KEY,binding.loginPlainText.text.toString())
-                putString(PASSWORD_KEY,binding.passwordPlainText.text.toString())
                 apply()
             }
             findNavController().navigate(R.id.action_connectionSettingsFragment_to_scanFragment)

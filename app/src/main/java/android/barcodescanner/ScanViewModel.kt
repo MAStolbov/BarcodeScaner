@@ -3,20 +3,14 @@ package android.barcodescanner
 import android.content.Context
 import android.dataStorage.Account
 import android.dataStorage.Service
-import android.graphics.Typeface
 import android.net.ConnectivityManager
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.RelativeSizeSpan
-import android.text.style.StyleSpan
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import java.lang.Exception
 import java.util.zip.CRC32
 
 class ScanViewModel : ViewModel() {
     private val barcodeFormat = Regex("""\d{1,9}-\d{4,15}""")
+    private val priceFormat = Regex("""\d*(?:\.[0-9]+)?""")
 
     val endLoading = MutableLiveData<Boolean>()
     var account: Account? = Account()
@@ -33,7 +27,7 @@ class ScanViewModel : ViewModel() {
         }
     }
 
-    fun openSettings(barcode:String):Boolean{
+    fun openSettings(barcode: String): Boolean {
         return barcode == "settings"
     }
 
@@ -41,8 +35,18 @@ class ScanViewModel : ViewModel() {
         servicesList.value = account?.services
     }
 
-    fun getTotalPrice(): Int {
-        return account?.services?.map { it.price.toInt() }?.sum() ?: 0
+//    fun getTotalPrice(): Int {
+//        return account?.services?.map { it.price.toInt() }?.sum() ?: 0
+//    }
+
+    fun getTotalPrice(): Double {
+        var totalPrice = 0.0
+        account?.services?.forEach {
+            if (checkStringForNumbers(it.price) && preparePriceString(it.price).isNotEmpty()){
+                totalPrice += preparePriceString(it.price).toDouble()
+            }
+        }
+        return totalPrice
     }
 
     fun verifyAvailableNetwork(context: Context?): Boolean {
@@ -50,5 +54,16 @@ class ScanViewModel : ViewModel() {
             context?.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkInfo = connectivityManager.activeNetworkInfo
         return networkInfo != null && networkInfo.isConnected
+    }
+
+    private fun checkStringForNumbers(stringWithPrice: String): Boolean {
+        val stringForCheck = preparePriceString(stringWithPrice)
+        return priceFormat.matches(stringForCheck)
+    }
+
+    private fun preparePriceString(priceString: String): String {
+        return priceString
+            .replace(" ", "")
+            .replace(",", ".")
     }
 }

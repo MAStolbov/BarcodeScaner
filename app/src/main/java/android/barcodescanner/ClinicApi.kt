@@ -21,11 +21,11 @@ interface ClinicApi {
 
 
     companion object Factory {
-        fun create(serverAddress:String): ClinicApi {
+        fun create(serverIp:String): ClinicApi {
             val retrofit = Retrofit.Builder()
                 .addConverterFactory(TikXmlConverterFactory.create())
                 .addCallAdapterFactory(CoroutineCallAdapterFactory())
-                .baseUrl(serverAddress)
+                .baseUrl("http://$serverIp/ClinicWork/hs/ClinicRoot/GetCustomerInfo/")
                 .build()
 
             return retrofit.create(ClinicApi::class.java)

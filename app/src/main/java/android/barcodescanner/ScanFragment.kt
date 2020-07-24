@@ -25,8 +25,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 const val SERVER_ADDRESS_KEY = "server address"
-const val LOGIN_KEY = "login"
-const val PASSWORD_KEY = "password"
 
 class ScanFragment : Fragment() {
 
@@ -158,11 +156,9 @@ class ScanFragment : Fragment() {
         setViewsForScanVisibility(View.GONE)
         setLoadingViewsVisibility(View.VISIBLE)
         val serverAddress = connectionPreferences.getString(SERVER_ADDRESS_KEY, "") ?: ""
-        val login = connectionPreferences.getString(LOGIN_KEY, "") ?: ""
-        val password = connectionPreferences.getString(PASSWORD_KEY, "") ?: ""
         ioScope.launch {
             scanViewModel.account =
-                repository.getDataFromBase(serverAddress, login, password, barcode)
+                repository.getDataFromBase(serverAddress, barcode)
 //            scanViewModel.account = Util.setTextAccount()
 //            Util.dataReceivedSuccessful = true
             withContext(Dispatchers.Main) {
