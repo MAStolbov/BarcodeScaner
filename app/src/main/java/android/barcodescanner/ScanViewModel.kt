@@ -12,6 +12,7 @@ class ScanViewModel : ViewModel() {
     private val barcodeFormat = Regex("""\d{1,9}-\d{4,15}""")
     private val priceFormat = Regex("""\d*(?:\.[0-9]+)?""")
 
+    val wrongPriceFormatFounded = MutableLiveData<Boolean>()
     val endLoading = MutableLiveData<Boolean>()
     var account: Account? = Account()
     var servicesList = MutableLiveData<List<Service?>>()
@@ -35,15 +36,13 @@ class ScanViewModel : ViewModel() {
         servicesList.value = account?.services
     }
 
-//    fun getTotalPrice(): Int {
-//        return account?.services?.map { it.price.toInt() }?.sum() ?: 0
-//    }
-
     fun getTotalPrice(): Double {
         var totalPrice = 0.0
         account?.services?.forEach {
-            if (checkStringForNumbers(it.price) && preparePriceString(it.price).isNotEmpty()){
-                totalPrice += preparePriceString(it.price).toDouble()
+            if (checkStringForNumbers(it.price) && replaceSpacesAndCommas(it.price).isNotEmpty()){
+                totalPrice += replaceSpacesAndCommas(it.price).toDouble()
+            }else{
+                wrongPriceFormatFounded.value = true
             }
         }
         return totalPrice
@@ -57,11 +56,11 @@ class ScanViewModel : ViewModel() {
     }
 
     private fun checkStringForNumbers(stringWithPrice: String): Boolean {
-        val stringForCheck = preparePriceString(stringWithPrice)
+        val stringForCheck = replaceSpacesAndCommas(stringWithPrice)
         return priceFormat.matches(stringForCheck)
     }
 
-    private fun preparePriceString(priceString: String): String {
+    private fun replaceSpacesAndCommas(priceString: String): String {
         return priceString
             .replace(" ", "")
             .replace(",", ".")

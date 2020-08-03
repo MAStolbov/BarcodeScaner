@@ -1,6 +1,7 @@
 package android.barcodescanner
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.barcodescanner.databinding.FragmentScanBinding
 import android.content.Context
 import android.content.Intent
@@ -30,6 +31,7 @@ class ScanFragment : Fragment() {
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
     private val repository = Repository()
+    private lateinit var alertDialog: AlertDialog
     private lateinit var scanViewModel: ScanViewModel
     private lateinit var scanIntegrator: IntentIntegrator
     private lateinit var connectionPreferences: SharedPreferences
@@ -52,6 +54,10 @@ class ScanFragment : Fragment() {
         scanIntegrator.setBeepEnabled(false)
         scanIntegrator.setOrientationLocked(false)
 
+        scanViewModel.wrongPriceFormatFounded.observe(viewLifecycleOwner, Observer {
+            alertDialog.show()
+        })
+
         scanViewModel.endLoading.observe(viewLifecycleOwner, Observer {
             setLoadingViewsVisibility(View.GONE)
             setViewsForScanVisibility(View.VISIBLE)
@@ -70,9 +76,23 @@ class ScanFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        alertDialog = setAlertDialog()
         connectionPreferences =
             context.getSharedPreferences("connection settings", Context.MODE_PRIVATE)
 
+    }
+
+    private fun setAlertDialog(): AlertDialog {
+        val alertDialogBuilder = AlertDialog.Builder(context)
+
+        alertDialogBuilder.setTitle("Итоговая цена")
+        alertDialogBuilder.setMessage(
+            "Не все цены услуг вобшли в итоговую стоимость в виду неверного вида")
+        alertDialogBuilder.setPositiveButton("Ок") { dialog, which ->
+
+        }
+
+        return alertDialogBuilder.create()
     }
 
     private fun scanButtonClickListener(binding: FragmentScanBinding) {
@@ -138,7 +158,7 @@ class ScanFragment : Fragment() {
                             findNavController().navigate(R.id.action_scanFragment_to_connectionSettingsFragment)
                         }
                         if (scanViewModel.checkBarcodeCRC(result.contents)) {
-                            starDataLoading(result.contents)
+                            startDataLoading(result.contents)
                         } else {
                             showErrorInfo("Штрих-код не подлежит проверке (ошибка контрольной суммы):${result.contents}")
                         }
@@ -152,15 +172,14 @@ class ScanFragment : Fragment() {
         }
     }
 
-    private fun starDataLoading(barcode: String) {
+    private fun startDataLoading(barcode: String) {
         setViewsForScanVisibility(View.GONE)
         setLoadingViewsVisibility(View.VISIBLE)
         val serverAddress = connectionPreferences.getString(SERVER_ADDRESS_KEY, "") ?: ""
         ioScope.launch {
-            scanViewModel.account =
-                repository.getDataFromBase(serverAddress, barcode)
-//            scanViewModel.account = Util.setTextAccount()
-//            Util.dataReceivedSuccessful = true
+//            scanViewModel.account = repository.getDataFromBase(serverAddress, barcode)
+            scanViewModel.account = Util.setTextAccount()
+            Util.dataReceivedSuccessful = true
             withContext(Dispatchers.Main) {
                 if (Util.dataReceivedSuccessful) {
                     scanViewModel.endLoading.value = true
