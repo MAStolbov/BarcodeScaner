@@ -51,6 +51,8 @@ class ScanFragment : Fragment() {
         scanButtonClickListener(binding)
         binding.scaneButton.visibility = View.VISIBLE
 
+        binding.servicesList
+
         scanIntegrator.setBeepEnabled(false)
         scanIntegrator.setOrientationLocked(false)
 
@@ -177,9 +179,9 @@ class ScanFragment : Fragment() {
         setLoadingViewsVisibility(View.VISIBLE)
         val serverAddress = connectionPreferences.getString(SERVER_ADDRESS_KEY, "") ?: ""
         ioScope.launch {
-//            scanViewModel.account = repository.getDataFromBase(serverAddress, barcode)
-            scanViewModel.account = Util.setTextAccount()
-            Util.dataReceivedSuccessful = true
+            scanViewModel.account = repository.getDataFromBase(serverAddress, barcode)
+//            scanViewModel.account = Util.setTextAccount()
+//            Util.dataReceivedSuccessful = true
             withContext(Dispatchers.Main) {
                 if (Util.dataReceivedSuccessful) {
                     scanViewModel.endLoading.value = true
