@@ -129,11 +129,12 @@
 
         <TextView
             android:id="@+id/servicesText"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="172dp"
             android:layout_marginTop="20dp"
+            android:background="#7083ED"
             android:text="Услуги"
+            android:textAlignment="center"
             android:textColor="@android:color/black"
             android:textSize="16sp"
             android:visibility="gone"

@@ -12,7 +12,9 @@
         tools:layout="@layout/fragment_connection_settings">
         <action
             android:id="@+id/action_connectionSettingsFragment_to_scanFragment"
-            app:destination="@id/scanFragment" />
+            app:destination="@id/scanFragment"
+            app:popUpTo="@id/scanFragment"
+            app:popUpToInclusive="false" />
         <argument
             android:name="serverAddress"
             app:argType="string"
